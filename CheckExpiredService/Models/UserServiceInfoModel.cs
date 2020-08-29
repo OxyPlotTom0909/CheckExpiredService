@@ -22,6 +22,12 @@ namespace CheckExpiredService.Models
 
         public string ServiceStatus { get; set; }
 
+        public string SendMessagePlatform { get; set; }
+
+        public string PurchasedID { get; set; }
+
+        public int ExpiredNotifyTimes { get; set; }
+
         public int RemainedDays { get; set; }
 
         public UserServiceInfoModel(string userService, string userId)
@@ -33,6 +39,9 @@ namespace CheckExpiredService.Models
             ServiceExpiredDate = DateTime.Now;
             ServiceTerm = string.Empty;
             ServiceStatus = string.Empty;
+            SendMessagePlatform = string.Empty;
+            PurchasedID = string.Empty;
+            ExpiredNotifyTimes = -1;
             RemainedDays = -1;
         }
 

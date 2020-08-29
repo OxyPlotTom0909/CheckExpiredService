@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -12,13 +9,14 @@ using CheckExpiredService.Message;
 
 namespace CheckExpiredService.Utility
 {
-    public class NotifyClient
+    public class NotifyClient : IDisposable
     {
         private const string NOTIFY_BOT_URI = "https://notify-bot.line.me";
         private const string NOTIFY_API_URI = "https://notify-api.line.me";
 
         private HttpClient _client;
         private string _notifyUri;
+        private bool disposedValue;
 
         public NotifyClient(string notifyUri = NOTIFY_BOT_URI)
         {
@@ -73,7 +71,6 @@ namespace CheckExpiredService.Utility
         {
             _notifyUri = NOTIFY_API_URI;
             string notifyuri = $"{_notifyUri}/api/notify";
-            string returnMessage = string.Empty;
             HttpResponseMessage response;
 
             var hadHeader = _client.DefaultRequestHeaders.Contains("Authorization");
@@ -101,7 +98,6 @@ namespace CheckExpiredService.Utility
         {
             _notifyUri = NOTIFY_API_URI;
             string notifyuri = $"{_notifyUri}/api/notify";
-            string returnMessage = string.Empty;
             HttpResponseMessage response;
 
             var hadHeader = _client.DefaultRequestHeaders.Contains("Authorization");
@@ -132,7 +128,6 @@ namespace CheckExpiredService.Utility
         {
             _notifyUri = NOTIFY_API_URI;
             string notifyuri = $"{_notifyUri}/api/notify";
-            string returnMessage = string.Empty;
             HttpResponseMessage response;
 
             var hadHeader = _client.DefaultRequestHeaders.Contains("Authorization");
@@ -156,6 +151,35 @@ namespace CheckExpiredService.Utility
             if (result == null) { return null; }
 
             return (string)result?.message;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: 處置 Managed 狀態 (Managed 物件)。
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: 將大型欄位設為 null。
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~NotifyClient()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
