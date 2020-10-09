@@ -15,7 +15,7 @@ namespace CheckExpiredService
     public static class CheckExpiredService
     {
         [FunctionName("CheckExpiredService")]
-        public static async Task Run([TimerTrigger("0 0 0 * * 1-6")] TimerInfo myTimer, ILogger log)
+        public static async Task Run([TimerTrigger("0 0 0 * * *")] TimerInfo myTimer, ILogger log)
         {
             string message = string.Empty;
             string messageContent = string.Empty;
@@ -45,15 +45,22 @@ namespace CheckExpiredService
                 // Comfirm the MAC is availble to use notify funtion
                 foreach (var alive in mac)
                 {
+                    bool bChange = false;
                     var days = Math.Ceiling(new TimeSpan(alive.ServiceExpiredDate.Ticks - now.Ticks).TotalDays);
-                    alive.RemainedDays = Convert.ToInt16(days);
-
+                    if (days >= 0)
+                    {
+                        alive.RemainedDays = Convert.ToInt16(days);
+                        bChange = true;
+                    }
+                        
                     if (alive.RemainedDays <= 0)
                     {
                         alive.ServiceStatus = "Expired";
+                        bChange = true;
                     }
 
-                    await macList.UpdateAsync(alive);
+                    if (bChange)
+                        await macList.UpdateAsync(alive);
                 }
 
                 var clientList = await TableStorage<UserLineInfo>.CreateTable(connectingString, "ClientInfo");
@@ -77,7 +84,8 @@ namespace CheckExpiredService
                 foreach (var service in serviceTable)
                 {
                     var days = Math.Ceiling(new TimeSpan(service.ServiceExpiredDate.Ticks - now.Ticks).TotalDays);
-                    service.RemainedDays = Convert.ToInt16(days);
+                    if (days >= 0)
+                        service.RemainedDays = Convert.ToInt16(days);
 
                     if (days <= Convert.ToInt16(serviceParam["ServiceRemindDays"]) && service.ExpiredNotifyTimes > 0)
                     {
